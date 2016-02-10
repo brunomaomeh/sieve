@@ -38,6 +38,8 @@ public class CountPrimesMaster extends AbstractFSM<CountPrimesMasterState, Count
                             }
                         }));
 
+        initialize();
+
     }
 
 }
