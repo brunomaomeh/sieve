@@ -32,7 +32,7 @@ public class CountPrimesWorkerTest {
     public void must_find_three_primes_up_to_four(){
         new JavaTestKit(system){{
             ActorRef sieveWorker = system.actorOf(Props.create(CountPrimesWorker.class));
-            sieveWorker.tell(new CountPrimes(4), getRef());
+            sieveWorker.tell(new CountPrimes(0, 0, 4), getRef());
             CountPrimesResult result = expectMsgClass(CountPrimesResult.class);
             Assert.assertEquals(3, result.getResult());
         }};
@@ -43,7 +43,7 @@ public class CountPrimesWorkerTest {
 
         new JavaTestKit(system){{
             ActorRef sieveWorker = system.actorOf(Props.create(CountPrimesWorker.class));
-            sieveWorker.tell(new CountPrimes(10), getRef());
+            sieveWorker.tell(new CountPrimes(0, 0, 10), getRef());
             CountPrimesResult result = expectMsgClass(CountPrimesResult.class);
             Assert.assertEquals(4, result.getResult());
         }};
@@ -53,7 +53,7 @@ public class CountPrimesWorkerTest {
     public void must_find_nine_primes_up_to_twenty(){
         new JavaTestKit(system){{
             ActorRef sieveWorker = system.actorOf(Props.create(CountPrimesWorker.class));
-            sieveWorker.tell(new CountPrimes(20), getRef());
+            sieveWorker.tell(new CountPrimes(0, 0, 20), getRef());
             CountPrimesResult result = expectMsgClass(CountPrimesResult.class);
             Assert.assertEquals(9, result.getResult());
         }};

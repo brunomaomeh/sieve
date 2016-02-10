@@ -14,8 +14,8 @@ public class CountPrimesWorker extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof CountPrimes){
             CountPrimes countPrimes = (CountPrimes) message;
-            Integer result = countPrimes(countPrimes.getValue());
-            sender().tell(new CountPrimesResult(result), self());
+            Integer result = countPrimes(countPrimes.getN());
+            sender().tell(new CountPrimesResult(countPrimes.getX(), countPrimes.getY(), result), self());
         }
     }
 
@@ -25,7 +25,7 @@ public class CountPrimesWorker extends UntypedActor {
      * of 2. So we repeat to first non marked number in previous step (the number 3). We repeat this algorithm
      * to all numbers less than square root of N. After this steps, all non marked numbers are primes
      * @param n upper bound to count primes
-     * @return how many prime there is not greater than n
+     * @return the number of primes not greater than n
      */
     private Integer countPrimes(Integer n){
         BitSet sieve = new BitSet(n);
