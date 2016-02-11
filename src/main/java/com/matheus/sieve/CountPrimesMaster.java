@@ -1,14 +1,20 @@
 package com.matheus.sieve;
 
 import akka.actor.AbstractFSM;
+import akka.actor.AbstractLoggingFSM;
 import akka.actor.ActorRef;
 import com.matheus.sieve.messages.*;
 
 /**
  * Created by matheus on 09/02/2016.
  */
-public class CountPrimesMaster extends AbstractFSM<CountPrimesMasterState, CountPrimesMasterData> {
+public class CountPrimesMaster extends AbstractLoggingFSM<CountPrimesMasterState, CountPrimesMasterData> {
     private ActorRef countPrimesWorker;
+    private long beging;
+
+    private long now(){
+        return System.nanoTime();
+    }
 
     public CountPrimesMaster(ActorRef countPrimesWorker) {
         this.countPrimesWorker = countPrimesWorker;
@@ -37,6 +43,16 @@ public class CountPrimesMaster extends AbstractFSM<CountPrimesMasterState, Count
                                 return stay().using(computing);
                             }
                         }));
+
+        onTransition(
+                matchState(CountPrimesMasterState.Idle, CountPrimesMasterState.Busy, () -> beging = now())
+                        .state(CountPrimesMasterState.Busy, CountPrimesMasterState.Idle,
+                                () ->{
+                                    long end = now();
+                                    long timeElapsed = (end - beging)/1000000;
+                                    log().info("Time elapsed to compute the matrix (ms): " + timeElapsed);
+                                } )
+        );
 
         initialize();
 

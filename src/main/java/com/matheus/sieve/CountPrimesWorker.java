@@ -1,6 +1,8 @@
 package com.matheus.sieve;
 
 import akka.actor.UntypedActor;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import com.matheus.sieve.messages.CountPrimes;
 import com.matheus.sieve.messages.CountPrimesResult;
 
@@ -10,11 +12,13 @@ import java.util.BitSet;
  * Created by matheus on 06/02/2016.
  */
 public class CountPrimesWorker extends UntypedActor {
+    LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof CountPrimes){
             CountPrimes countPrimes = (CountPrimes) message;
             Integer result = countPrimes(countPrimes.getN());
+            log.info("There is " + result + " numbers primes not greater than " + countPrimes.getN());
             sender().tell(new CountPrimesResult(countPrimes.getX(), countPrimes.getY(), result), self());
         }
     }

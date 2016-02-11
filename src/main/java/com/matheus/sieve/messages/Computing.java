@@ -18,7 +18,6 @@ public class Computing implements CountPrimesMasterData {
     public void setMatrixElement(int x, int y, int n){
         matrix[x][y] = n;
         count++;
-        System.out.println( count + " item(s) computed");
     }
 
     public boolean computationIsDone(){
