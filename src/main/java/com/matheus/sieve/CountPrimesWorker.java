@@ -17,8 +17,11 @@ public class CountPrimesWorker extends UntypedActor {
     public void onReceive(Object message) throws Exception {
         if (message instanceof CountPrimes){
             CountPrimes countPrimes = (CountPrimes) message;
+            long begin = System.nanoTime();
             Integer result = countPrimes(countPrimes.getN());
-            log.info("There is " + result + " numbers primes not greater than " + countPrimes.getN());
+            long end = System.nanoTime();
+            long timeElapsed = (end - begin) / 1000000;
+            log.info("There is " + result + " numbers primes not greater than " + countPrimes.getN() + " computed in " + timeElapsed + " ms");
             sender().tell(new CountPrimesResult(countPrimes.getX(), countPrimes.getY(), result), self());
         }
     }
