@@ -9,6 +9,7 @@ import java.io.Serializable;
  * x and y of origin matrix
  */
 public final class CountPrimes implements Serializable {
+    private static final long serialVersionUID = 7927369499706590430L;
     private int x, y, n;
 
     public CountPrimes(int x, int y, int n) {

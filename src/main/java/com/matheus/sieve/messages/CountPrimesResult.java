@@ -1,9 +1,12 @@
 package com.matheus.sieve.messages;
 
+import java.io.Serializable;
+
 /**
  * Created by matheus on 06/02/2016.
  */
-public final class CountPrimesResult {
+public final class CountPrimesResult implements Serializable{
+    private static final long serialVersionUID = 4783813194370363041L;
     private int x, y, result;
 
     public CountPrimesResult(int x, int y, int result) {

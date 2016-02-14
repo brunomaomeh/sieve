@@ -1,6 +1,8 @@
 package com.matheus.sieve;
 
 import akka.actor.*;
+import akka.cluster.Cluster;
+import akka.routing.FromConfig;
 import com.matheus.sieve.messages.CountMatrixOfPrimes;
 import com.matheus.sieve.messages.CountMatrixOfPrimesResult;
 import com.matheus.sieve.messages.CountPrimes;
@@ -12,7 +14,7 @@ import java.util.Random;
  */
 public class Main {
 
-    public static int[][] randomMatrix(int x, int y, int n){
+    private static int[][] randomMatrix(int x, int y, int n){
         Random random = new Random();
         random.setSeed(System.currentTimeMillis());
         int[][] matrix = new int[x][y];
@@ -22,39 +24,23 @@ public class Main {
         return matrix;
     }
 
+    private static int[][] generateMatrix(int x, int y, int n){
+        int[][] matrix = new int[x][y];
+        for(int i = 0; i < matrix.length; i++)
+            for(int j = 0; j < matrix[i].length; j++)
+                matrix[i][j] = n;
+        return matrix;
+    }
+
     public static void main(String[] args){
-        ActorSystem system = ActorSystem.create();
-        ActorRef countPrimesWorker = system.actorOf(Props.create(CountPrimesWorker.class));
-        ActorRef countPrimesMaster = system.actorOf(Props.create(CountPrimesMaster.class, countPrimesWorker));
+        ActorSystem system = ActorSystem.create("sieve");
+        ActorRef countPrimesWorker = system.actorOf(FromConfig.getInstance().props(Props.create(CountPrimesWorker.class)), "CountPrimesWorker");
 
-        class Benchmark extends UntypedActor{
-            private ActorRef countPrimesMaster;
-            private long begin;
+        Cluster.get(system).getSelfRoles().stream().filter(role -> role.equals("MASTER")).findFirst().ifPresent(x -> Cluster.get(system).registerOnMemberUp(() -> {
+            ActorRef countPrimesMaster = system.actorOf(Props.create(CountPrimesMaster.class, countPrimesWorker), "CountPrimesMaster");
+            CountMatrixOfPrimes countPrimes = new CountMatrixOfPrimes(randomMatrix(100, 100, 1000000));
+            countPrimesMaster.tell(countPrimes, ActorRef.noSender());
+        }));
 
-            private long now(){
-                return System.nanoTime();
-            }
-
-            public Benchmark(ActorRef countPrimesMaster) {
-                this.countPrimesMaster = countPrimesMaster;
-            }
-
-            @Override
-            public void onReceive(Object message) throws Exception {
-                if (message instanceof CountMatrixOfPrimes){
-                    begin = now();
-                    countPrimesMaster.tell(message, context().self());
-                }else if(message instanceof CountMatrixOfPrimesResult){
-                    long end = now();
-                    long timeElapsed = (end - begin) / 1000000;
-                    System.out.println("Time elapsed (ms): " + timeElapsed);
-                }
-
-            }
-        }
-
-        ActorRef benchmark = system.actorOf(Props.create(Benchmark.class, countPrimesMaster));
-        CountMatrixOfPrimes countPrimes = new CountMatrixOfPrimes(randomMatrix(1000, 1000, 1000));
-        benchmark.tell(countPrimes, ActorRef.noSender());
     }
 }

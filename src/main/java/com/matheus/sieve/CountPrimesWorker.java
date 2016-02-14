@@ -13,6 +13,7 @@ import java.util.BitSet;
  */
 public class CountPrimesWorker extends UntypedActor {
     LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+
     @Override
     public void onReceive(Object message) throws Exception {
         if (message instanceof CountPrimes){
